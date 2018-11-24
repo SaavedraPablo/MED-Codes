@@ -1,0 +1,143 @@
+\                     ********************* FEATURE-NEGATIVE DISCRIMINATION ****************************
+
+\OUTPUTS AND INPUTS
+
+\INPUTS
+
+^APPROACH = 1
+
+\OUTPUTS
+
+
+^CS_X = 6 \TONE
+^PELLET = 3 
+^CS_A = 4 \HOUSELIGHT
+
+\VARIABLE DEFINITION
+
+\A = LIST OF VALUES FOR THE INTERTRIAL INTERVAL
+\B = CURRENT VALUE FOR THE ITI 
+\C = LIST OF VALUES TO BE SELECTED RANDOMLY WITHOUT REPLACEMENT FOR DETERMINING TRIAL TYPES WITHIN A FOUR TRIAL BLOCK
+\D = CURRENT VALUE FOR TRIAL TYPE (0 = A+ TRIAL, 1 = AX- TRIAL)
+\O = NUMBER OF APPROACH RESPONSES DURING A+ TRIALS
+\P = NUMBER OF APPROACH RESPONSES DURING AX- TRIALS
+
+\ VARRIABLE INTERVAL LIST
+
+LIST A = 26.28", 28.83", 31.46", 34.17", 36.98", 39.89", 42.9", 46.03", 49.28", 52.67", 56.19", 59.88", 63.73", 67.78", 72.03", 76.51", 81.25", 86.28", 91.63", 97.36", 103.51", 110.15", 117.38", 125.30", 134.06", 143.86", 154.99", 167.86", 183.13", 201.94", 226.47", 262.22" 
+
+LIST C = 0, 0, 1, 1
+
+DISKCOLUMNS = 1
+
+DISKVARS = O, P
+
+\                      *********************VARIABLE TIME 192 SECONDS**************************
+
+S.S.1
+
+S1,
+
+#START: RANDD B = A; ---> S2
+
+S2,
+
+B#T: Z1; ---> S3 
+
+S3,
+
+.1": RANDD B = A ---> S2 
+
+
+\                       *******************TRIAL SELECTION****************************
+
+S.S.2
+
+S1,
+
+#Z1: RANDD D = C ---> S2 
+
+S2,
+
+.01": IF D = 0 [@SI, @NO]
+                @SI: ---> S3 \A+ TRIAL
+                @NO: ---> S6 \AX- TRIAL
+
+S3,
+
+.01": ON ^CS_A ---> S4
+
+S4,
+
+8": ON ^PELLET; OFF ^CS_A; ---> S5
+#R^APPROACH: ADD O ---> SX
+
+S5,
+
+.2": OFF ^PELLET; ---> S8
+
+S6,
+
+.02": ON ^CS_A; ON ^CS_X ---> S7
+
+S7,
+
+8": OFF ^CS_X; OFF ^CS_A; Z30 ---> S1
+#R^APPROACH: ADD P ---> SX
+
+S8,
+
+1": ON ^PELLET;---> S9
+
+S9,
+
+.02": OFF ^PELLET ---> S1
+
+
+
+
+
+\                                 *************************SESSION ENDING CRITERION**********************************
+
+S.S.8
+
+S1, 
+
+#START: ---> S2
+
+S2, 
+
+32#Z1:  ---> S3
+
+S3,
+
+12": Z3; ALERTON ---> S4
+
+S4,
+
+8": ALERTOFF ---> STOPABORTFLUSH
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

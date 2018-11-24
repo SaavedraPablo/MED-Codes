@@ -1,0 +1,192 @@
+\                   **********************INTERTEMPORAL CHOICE (SMALLER SOONER ALTERNATIVE IN LEFT LEVER)**********************************
+
+\AUTOR: R.SOSA
+
+\OUTPUT AND INPUT DEFINITION
+
+\-----------------Inputs---------------
+
+^LEFT = 1
+^RIGHT = 2
+
+\-----------------Outputs--------------
+
+^LLEVER = 1
+^RLEVER = 2
+^PELLET = 3
+
+
+\ C = TOTAL RESPONSES IN THE LEVER ASSOCIATED WITH THE LARGER LATER ALTERNATIVE DURING FREE TRIALS
+\ D = TOTAL RESPONSES IN THE LEVER ASSOCIATED WITH THE SMALLER SOONER ALTERNATIVE DURING FREE TRIALS
+\ Q = INFORMS ABOUT THE LAST CHOICE (1 = LL, 2 = SS)
+\ R = AMOUNT OF PELLETS TO BE DELIVERED
+\ U = NUMBER OF CONSECUTIVE CHOICES FOR THE SS ALTERNATIVE IN FREE TRIALS
+\ V = NUMBER OF CONSECUTIVE CHOICES FOR THE LL ALTERNATIVE IN FREE TRIALS
+
+
+\LIST OF VALUES FOR THE VARIABLE INTERVAL SCHEDULES
+
+LIST Y = 0.76", 1.13", 1.51", 1.9", 2.3", 2.71", 3.14", 3.58", 4.03", 4.49", 4.97", 5.47", 5.98", 6.52", 7.07", 7.65", 8.25", 8.88", 9.53", 10.22", 10.94", 11.7", 12.5", 13.35", 14.25", 15.22", 16.25", 17.36", 18.56", 19.87", 21.32", 22.92", 24.73", 26.8", 29.21", 32.11", 35.76", 40.66", 48.2", 68.19"
+
+DISKCOLUMNS = 1
+DISKVARS = C, D
+
+
+\ ----------------  OPERATION OF THE PROGRAM --------------------------------
+
+
+S.S.1,
+
+S1,
+
+#START: ---> S2
+
+S2, 
+
+.01": SET Q = 0; ON ^LLEVER, ^RLEVER; Z2; IF V = 2 [@YES, @NO]
+                                                    @YES: ---> S9
+                                                    @NO: IF U = 2 [@YES, @NO]
+                                                                   @YES:  ---> S10
+                                                                   @NO:  ---> S4
+
+
+S4,
+
+#R^LEFT: RANDD X = Y; ADD C ---> S6
+#R^RIGHT: RANDD X = Y; ADD D ---> S6
+#Z5: ---> S1
+
+
+S6,
+
+X#T: ---> S22 
+#R^LEFT:ADD C ---> SX
+#R^RIGHT:ADD D ---> SX
+
+#Z5: ---> S1
+
+ 
+S7,
+
+#R^LEFT: SET Q = 1 ---> S22
+#R^RIGHT: SET Q = 2 ---> S22
+#Z5: ---> S1
+
+S9, 
+
+#R^LEFT: ---> S9
+#R^RIGHT: RANDD X = Y ---> S18
+
+#Z5: ---> S1
+
+S10,  
+
+#R^LEFT: RANDD X = Y ---> S20
+#R^RIGHT: Z17 ---> S10
+#Z5: ---> S1
+
+S12,
+
+20": ---> S13
+#Z5: ---> S1
+
+S13,
+
+.1": ON ^PELLET; SET R = R - 1 ---> S14
+
+S14,
+
+.2": OFF ^PELLET; IF R = 0 [@YES, @NO]
+                            @YES: IF Q = 1 [@YES, @NO]
+                                            @YES: ---> S15
+                                            @NO: ---> S16
+                            @NO: ---> S17
+
+S15,
+
+21": ---> S2
+#Z5: ---> S1
+
+S16,
+
+45": ---> S2
+#Z5: ---> S1
+
+S17,
+
+1": ---> S13
+
+S18,
+
+X#T: ---> S23
+#Z5: ---> S1
+
+S19,
+
+#R^LEFT: ---> S19
+#R^RIGHT: SET Q = 2 ---> S23
+#Z5: ---> S1
+
+S20,
+
+X#T:---> S25
+#Z5: ---> S1
+
+S21,
+
+#R^LEFT: SET Q = 1 ---> S25 
+#R^RIGHT: Z17 ---> S21
+#Z5: ---> S1       
+
+S22,
+
+.1": IF Q = 0 [@YES, @NO]
+               @YES: ---> S7
+               @NO: OFF ^LLEVER, ^RLEVER; IF Q = 1 [@YES, @NO]
+                                                    @YES: ADD V; ADD C; SET U = 0; SET R = 5 ---> S12
+                                                    @NO: ADD U; ADD D; SET V = 0; SET R = 1 ---> S13   
+
+S23,
+
+.1": IF Q = 0 [@YES, @NO]
+               @YES: ---> S19
+               @NO: OFF ^LLEVER, ^RLEVER; IF Q = 1 [@YES, @NO]
+                                                    @YES: SET R = 5; SET V = 0; SET U = 0 ---> S12
+                                                    @NO: SET R = 1; SET V = 0; SET U = 0  ---> S13
+
+
+S25, 
+
+.1": IF Q = 0 [@YES, @NO]
+               @YES: ---> S21
+               @NO: OFF ^LLEVER, ^RLEVER; IF Q = 1 [@YES, @NO]
+                                                    @YES: SET R = 5; SET V = 0; SET U = 0 ---> S12
+                                                    @NO: SET R = 1; SET V = 0; SET U = 0 ---> S13
+      
+
+\                                ***********************************CRITERIA FOR FINISHING A SESSION **********************************
+
+S.S.2
+
+S1,
+
+#START: ---> S2
+
+S2,
+
+50': ---> S3
+40#Z2: ---> S3
+
+S3,
+
+.01": OFF ^LLEVER, ^RLEVER; Z5; ALERTON ---> S4
+
+S4,
+
+8": ALERTOFF ---> STOPABORTFLUSH        
+
+
+
+
+
+

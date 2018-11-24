@@ -1,0 +1,86 @@
+
+
+
+
+
+
+\----------------------------------------------DRL 10 S --------------------------------------------------------------------------------
+
+
+\Outputs
+^Dispenser= 3
+
+\Inputs
+^Resp_left = 1
+
+^Session = 48000 	
+^Reward = 100 		
+^IRT = 10 	
+^LLEVER	= 1
+
+\B= Session duration
+\D= Number of rewards obtained
+\M= Cumulative record of responses
+\X= Number of responses
+
+DIM M=5000  
+    \X 
+DIM R = 3
+
+
+DISKCOLUMNS = 1
+DISKVARS = M
+
+
+
+\\\\\\\\\\\\ Time counter and session ending criteria by time or number of rewards\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+		
+s.s.1
+
+s1, 
+#START: SET B = 0; ON ^LLEVER --->s2
+
+s2 ,
+.05": ADD B; IF B >= ^Session [@YES, @NO]                
+                               @YES: ALERT ON ---> s3
+                               @NO: IF D = ^Reward  [@YES, @NO]
+                                                     @YES: ALERT ON ---> s3
+                                                     @NO:---> s2
+s3,
+ 1": ALERT OFF ---> STOPABORTFLUSH
+
+
+\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\ Session Timer \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+
+s.s.2
+s1,
+#START: SET F=0 ---> s2                 
+s2, 
+.05": IF R(1)= 0 [@YES, @NO]
+                  @YES: SET F = F + .05 ---> s2
+                  @NO:---> s2
+
+\\\\\\\\\\ Algorithm used to determine if the subject recieves the reward (interresponse time > 10 s) and register the time at which it was obtained \\\\\\\\\\
+
+s.s.3
+s1, 
+#START: --->s2
+
+
+s2,
+  #R^Resp_left : IF F >= ^IRT*20 [@YES, @NO] 
+                                  @YES: ON ^Dispenser; Z1; ADD D; SET M(X)= F; ADD X; SET F= 0; SET R(1)=1; SET M(X)= -987.987---> s3
+                                  @NO: SET M(X)= F ; ADD X; SET F= 0; SET M(X)= -987.987 --->s2
+s3,
+2": SET F=0 ;SET R(1)=0; IF D = ^Reward [@YES, @NO] 
+                                         @YES: --->sx
+                                         @NO: --->s2
+                    
+
+       \\\\\\\\\\\\\\\\\\\\\\\\\\\ Pulse to disable the dispenser \\\\\\\\\\\\\\\\\\\\\\\\\\\
+S.S.4
+S1,
+#Z1: ---> S2
+
+S2,
+.02": OFF^Dispenser ---> S1
