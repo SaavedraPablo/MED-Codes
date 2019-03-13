@@ -59,8 +59,8 @@ S1,
 
 S2,
 
-.01": IF D = 0 [@SI, @NO]
-                @SI: ---> S3 \A+ TRIAL
+.01": IF D = 0 [@YES, @NO]
+                @YES: ---> S3 \A+ TRIAL
                 @NO: ---> S6 \AX- TRIAL
 
 S3,
